@@ -1,0 +1,27 @@
+version: '3'
+
+
+services: 
+    app:
+        container_name: iroha_app
+        build: ./app
+        tty: true
+        ports: 
+            - 80:80
+            # Please use if you need ssl.
+            # - 443:443
+        depends_on: 
+            - db
+    
+    db:
+        container_name: iroha_db
+        build: ./db
+        environment: 
+            MYSQL_ROOT_PASSWORD: rootp@ss
+            MYSQL_DATABASE: irohaboard
+            MYSQL_USER: iroha
+            MYSQL_PASSWORD: iroha
+        # ports: 
+        #     - 3306:3306
+        volumes: 
+          - ./db/data:/var/lib/mysql
