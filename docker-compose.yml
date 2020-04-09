@@ -6,13 +6,17 @@ services:
         container_name: iroha_app
         build: ./app
         tty: true
-        ports: 
-            - 80:80
+        # ports: 
+            # - 80:80
             # Please use if you need ssl.
             # - 443:443
+        environment:
+            VIRTUAL_HOST: learning.solxyz.app
+            LETSENCRYPT_HOST: learning.solxyz.app
+            LETSENCRYPT_EMAIL: hisato@solxyz.co.jp
         depends_on: 
             - db
-    
+        
     db:
         container_name: iroha_db
         build: ./db
@@ -25,3 +29,65 @@ services:
         #     - 3306:3306
         volumes: 
           - ./db/data:/var/lib/mysql
+    relate:
+        container_name: relate_app
+        build : ./relateapp
+        environment:
+            VIRTUAL_HOST: training.solxyz.app
+            LETSENCRYPT_HOST: training.solxyz.app
+            LETSENCRYPT_EMAIL: hisato@solxyz.co.jp
+        depends_on:
+          - relate_db
+            #ports:
+            #- 8000:8000
+        volumes:
+          - ./repos:/repos
+    
+    relate_db:
+        container_name: relate_db
+        image: postgres:11-alpine
+        environment: 
+            POSTGRES_USER: relate
+            POSTGRES_DB: relate
+            POSTGRES_PASSWORD: relate
+        volumes:
+          - ./relatedb:/var/lib/postgresql/data
+    mail:
+        container_name: relate_mail
+        image: takeyamajp/postfix
+        environment: 
+            - maildomain=solxyz.info
+            - smtp_user=relate:relate
+    nginx-proxy:
+        image: jwilder/nginx-proxy # 独自 Docker ファイルをやめる
+        restart: on-failure
+        # ラベルを追加
+        labels:
+          - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=jwilder/nginx-proxy
+        container_name: nginx-proxy
+        privileged: true
+        ports:
+          - "80:80"
+          - "443:443" # ポート追加
+        # ボリュームを追加
+        volumes:
+          - proxy:/etc/nginx/vhost.d
+          - proxy:/usr/share/nginx/html
+          - /var/run/docker.sock:/tmp/docker.sock:ro
+          - ./certs:/etc/nginx/certs:ro
+          - ./server.conf:/etc/nginx/conf.d/server.conf
+ 
+    letsencrypt: # 盛大に追加
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        restart: on-failure
+        container_name: letsencrypt-nginx
+        depends_on:
+          - nginx-proxy
+        volumes:
+          - proxy:/etc/nginx/vhost.d
+          - proxy:/usr/share/nginx/html
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+          - ./certs:/etc/nginx/certs:rw
+
+volumes:
+    proxy:
