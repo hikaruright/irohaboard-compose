@@ -16,7 +16,7 @@ $ cd irohaboard-compose
 $ docker-compose up -d
 ```
 
-## Access to your site and setupping.
+## Access to your site and setupping
 
 Open web browser and open the link.
 

@@ -19,48 +19,19 @@ services:
             - db
         volumes:
             - ./uploads:/var/www/html/app/webroot/uploads
-        
+
     db:
         container_name: iroha_db
         build: ./db
-        environment: 
+        environment:
             MYSQL_ROOT_PASSWORD: rootp@ss
             MYSQL_DATABASE: irohaboard
             MYSQL_USER: iroha
             MYSQL_PASSWORD: iroha
-        # ports: 
+        # ports:
         #     - 3306:3306
-        volumes: 
+        volumes:
           - ./db/data:/var/lib/mysql
-#     relate:
-#         container_name: relate_app
-#         build : ./relateapp
-#         environment:
-#             VIRTUAL_HOST: training.solxyz.app
-#             LETSENCRYPT_HOST: training.solxyz.app
-#             LETSENCRYPT_EMAIL: hisato@solxyz.co.jp
-#         depends_on:
-#           - relate_db
-#             #ports:
-#             #- 8000:8000
-#         volumes:
-#           - ./repos:/repos
-    
-#     relate_db:
-#         container_name: relate_db
-#         image: postgres:11-alpine
-#         environment: 
-#             POSTGRES_USER: relate
-#             POSTGRES_DB: relate
-#             POSTGRES_PASSWORD: relate
-#         volumes:
-#           - ./relatedb:/var/lib/postgresql/data
-    mail:
-        container_name: relate_mail
-        image: takeyamajp/postfix
-        environment: 
-            - maildomain=solxyz.info
-            - smtp_user=relate:relate
     nginx-proxy:
         image: jwilder/nginx-proxy # 独自 Docker ファイルをやめる
         restart: on-failure
@@ -79,7 +50,7 @@ services:
           - /var/run/docker.sock:/tmp/docker.sock:ro
           - ./certs:/etc/nginx/certs:ro
           - ./server.conf:/etc/nginx/conf.d/server.conf
- 
+
     letsencrypt: # 盛大に追加
         image: jrcs/letsencrypt-nginx-proxy-companion
         restart: on-failure
