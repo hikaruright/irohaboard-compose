@@ -12,9 +12,9 @@ services:
             # Please use if you need ssl.
             # - 443:443
         environment:
-            VIRTUAL_HOST: learning.solxyz.app
-            LETSENCRYPT_HOST: learning.solxyz.app
-            LETSENCRYPT_EMAIL: hisato@solxyz.co.jp
+            VIRTUAL_HOST: #change to your server address.
+            LETSENCRYPT_HOST: #change to your servier address.
+            LETSENCRYPT_EMAIL: #change to your mail address.
         depends_on: 
             - db
         volumes:
@@ -51,7 +51,7 @@ services:
           - ./certs:/etc/nginx/certs:ro
           - ./server.conf:/etc/nginx/conf.d/server.conf
 
-    letsencrypt: # 盛大に追加
+    letsencrypt: 
         image: jrcs/letsencrypt-nginx-proxy-companion
         restart: on-failure
         container_name: letsencrypt-nginx
